@@ -8,7 +8,7 @@
 project-root/
 ├── data/
 │   └── text.csv
-├── **.env**
+├── .env
 ├── .gitignore
 ├── README.md
 ├── app.py
