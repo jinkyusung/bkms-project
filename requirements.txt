@@ -1,0 +1,5 @@
+pandas==2.2.3
+openai==1.82.1
+streamlit==1.45.1
+matplotlib==3.10.3
+python-dotenv==1.1.0
