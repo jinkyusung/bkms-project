@@ -85,6 +85,8 @@ def purge() -> None:
             print(f"[PURGE] Remove unusable files: {pycache}")
 
 
+# ------------------------------------------------------------------------------------------ #
+
 
 def analyze_emotion(client, text):
     prompt = f"""
