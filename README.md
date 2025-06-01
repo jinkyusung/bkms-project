@@ -22,7 +22,8 @@ project-root/
 - `TEXT_CSV_PATH`
 
 > [!IMPORTANT]
-> 반드시 `.env` 파일을 직접 만들고, 상기한 모든 환경변수를 명시해야 정상적으로 실행됩니다. 자세한 사용법은 `python-dotenv` 라이브러리 [docs](https://pypi.org/project/python-dotenv/)를 참고해주세요.
+> 반드시 `.env` 파일을 직접 만들고, 상기한 모든 환경변수를 명시해야 정상적으로 실행됩니다.  
+> 자세한 사용법은 `python-dotenv` [docs](https://pypi.org/project/python-dotenv/)를 참고해주세요.
 
 ## Requirements
 
