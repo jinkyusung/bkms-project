@@ -1,88 +1,77 @@
-# app.py
 import streamlit as st
-import os
 import pandas as pd
-from datetime import datetime
-import matplotlib.pyplot as plt
+import datetime as dt
 from openai import OpenAI
+from procedure import boot, purge, analyze_emotion
 
-from dotenv import load_dotenv
+# ------------------------------------------------------------------------------------------ #
 
+args = boot()
+client = OpenAI(api_key=args.openai_api_key)
+text_csv = pd.read_csv(args.text_csv_path)
 
-# .env 파일에서 환경 변수 로드
-load_dotenv()
+st.set_page_config(page_title="나의 상담노트 감정 분석 챗봇", layout="centered")
+st.title("🧠 나의 상담노트 감정 분석 챗봇")
+st.write("감정일기를 입력하면 GPT가 핵심 감정을 분석해 드립니다.")
 
-openai_api_key = os.getenv('OPENAI_API_KEY')
-
-if not openai_api_key:
-    error_msg = """OpenAI API 키가 설정되지 않았습니다. 환경변수 파일 `.env`를 만들고 `OPENAI_API_KEY`를 설정해주세요."""
-    st.stop()
-
-client = OpenAI(api_key=openai_api_key)
+# ------------------------------------------------------------------------------------------ #
 
 
 if "emotion_log" not in st.session_state:
     st.session_state.emotion_log = []
 
-# 앱 UI 설정
-st.set_page_config(page_title="나의 상담노트 감정 분석 챗봇", layout="centered")
-st.title("🧠 나의 상담노트 감정 분석 챗봇")
-st.write("감정일기를 입력하면 GPT가 핵심 감정을 분석해 드립니다.")
+writen_date = st.date_input("**어느 날짜의 감정일기를 작성하시겠습니까?**", value=args.today, min_value=args.min_date, max_value=args.max_date)
+text = st.text_area("✍️ 감정일기를 작성하세요", height=250)
 
-# 감정일기 입력
-user_input = st.text_area("✍️ 감정일기를 작성하세요", height=250)
-
-# GPT 감정 분석 함수
-def analyze_emotion(text):
-    prompt = f"""
-    다음은 한 사용자의 감정일기입니다. 이 일기의 핵심 감정 하나를 정해주고, 신뢰도를 0~1 사이 수치로 제시해줘. 예시는 다음과 같아:
-    감정: 슬픔\n신뢰도: 0.83
-
-    일기: {text}
-    """
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "너는 감정 분석 전문가야."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content.strip()
-
-# 분석 버튼 동작
-if st.button("🔍 감정 분석하기"):
-    if user_input.strip():
-        with st.spinner("GPT가 감정을 분석하는 중입니다..."):
-            result = analyze_emotion(user_input)
-
+if st.button("📝 감정일기 저장하기"):  # for develope (without api call)
+    if text.strip():
         try:
-            emotion_line = next(line for line in result.splitlines() if "감정" in line)
-            confidence_line = next(line for line in result.splitlines() if "신뢰도" in line)
-            emotion = emotion_line.split(":")[-1].strip()
-            confidence = float(confidence_line.split(":")[-1].strip())
+            timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            new_row = pd.DataFrame([{"text": text, "date": writen_date, "timestamp": timestamp}])
+            text_csv = pd.concat([text_csv, new_row], ignore_index=True)
+            text_csv.to_csv(args.text_csv_path, index=False)
+            st.success(f"일기 저장 성공")
 
-            today = datetime.now().strftime("%Y-%m-%d")
-            st.session_state.emotion_log.append({
-                "날짜": today,
-                "감정": emotion,
-                "신뢰도": confidence
-            })
-
-            st.success(f"📌 감정 분석 결과: {emotion} (신뢰도: {confidence:.2f})")
         except Exception as e:
-            st.error(f"❌ 분석 결과 파싱 중 오류 발생: {e}")
-    else:
-        st.warning("먼저 감정일기를 입력해주세요!")
+            timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# if st.button("🔍 감정 분석하기"):
+#     if text.strip():
+#         with st.spinner("GPT가 감정을 분석하는 중입니다..."):
+#             result = analyze_emotion(text)
+#         try:
+#             emotion_line = next(line for line in result.splitlines() if "감정" in line)
+#             confidence_line = next(line for line in result.splitlines() if "신뢰도" in line)
+#             emotion = emotion_line.split(":")[-1].strip()
+#             confidence = float(confidence_line.split(":")[-1].strip())
+
+#             st.session_state.emotion_log.append({
+#                 "날짜": args.today,
+#                 "감정": emotion,
+#                 "신뢰도": confidence
+#             })
+
+#             st.success(f"📌 감정 분석 결과: {emotion} (신뢰도: {confidence:.2f})")
+#         except Exception as e:
+#             st.error(f"❌ 분석 결과 파싱 중 오류 발생: {e}")
+#     else:
+#         st.warning("먼저 감정일기를 입력해주세요!")
 
 # 감정 추이 시각화
-if st.session_state.emotion_log:
-    st.markdown("---")
-    st.subheader("📈 감정 추이 그래프")
+# if st.session_state.emotion_log:
+#     st.markdown("---")
+#     st.subheader("📈 감정 추이 그래프")
 
-    df = pd.DataFrame(st.session_state.emotion_log)
-    df_grouped = df.pivot_table(index="날짜", columns="감정", values="신뢰도", aggfunc="mean").fillna(0)
-    st.line_chart(df_grouped)
+#     df = pd.DataFrame(st.session_state.emotion_log)
+#     df_grouped = df.pivot_table(index="날짜", columns="감정", values="신뢰도", aggfunc="mean").fillna(0)
+#     st.line_chart(df_grouped)
 
-    st.markdown("---")
-    st.subheader("📋 감정 분석 기록")
-    st.dataframe(df.sort_values(by="날짜", ascending=False))
+#     st.markdown("---")
+#     st.subheader("📋 감정 분석 기록")
+#     st.dataframe(df.sort_values(by="날짜", ascending=False))
+
+# ------------------------------------------------------------------------------------------ #
+
+purge()
+
+# ------------------------------------------------------------------------------------------ #
