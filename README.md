@@ -29,6 +29,7 @@ project-root/
 
 ```bash
 conda create -n <env-name> python=3.10
+conda activate <env-name>
 pip install -r requirements.txt
 ```
 
