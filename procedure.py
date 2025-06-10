@@ -8,7 +8,7 @@ import streamlit as st
 from pandas import DataFrame
 import shutil
 import pathlib
-
+import json
 
 # ------------------------------------------------------------------------------------------ #
 
@@ -75,8 +75,6 @@ def boot() -> Arguments:
 
     return args
 
-
-
 def purge() -> None:
     # Remove all __pycache__ directories.
     for pycache in pathlib.Path(".").rglob("__pycache__"):
@@ -103,3 +101,67 @@ def analyze_emotion(client, text):
         ]
     )
     return response.choices[0].message.content.strip()
+
+# ------------------------------------------------------------------------------------------ #
+
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+from langchain.docstore.document import Document
+from langchain.prompts import PromptTemplate
+
+def load_documents(csv_path: str, limit: int = 100) -> list:
+    df = pd.read_csv(csv_path).dropna(subset=["human_speech"]).head(limit)
+    documents = [
+        Document(
+            page_content=row["human_speech"],
+            metadata={
+                "major_emotion": row.get("major_emotion", ""),
+                "minor_emotion": row.get("minor_emotion", "")
+            }
+        )
+        for _, row in df.iterrows()
+    ]
+    return documents
+
+def build_vectorstore(documents: list) -> FAISS:
+    embedding_model = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents, embedding_model)
+    return vectorstore
+
+def analyze_emotion_and_confidence(user_input: str, vectorstore: FAISS, top_k: int = 5) -> dict:
+    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": top_k})
+    relevant_docs = retriever.get_relevant_documents(user_input)
+
+    context = "\n".join([doc.page_content for doc in relevant_docs])
+
+    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
+
+    prompt_template = PromptTemplate.from_template("""
+    다음은 사용자가 작성한 감정 표현입니다:
+    "{user_input}"
+
+    아래는 데이터셋에서 검색된 유사 문장들입니다:
+    ---
+    {context}
+    ---
+
+    위 정보를 참고하여 사용자의 감정을 다음 JSON 형식으로 분석해 주세요:
+    {{
+        "major_emotion": "<기쁨, 슬픔, 분노, 불안, 당황, 상처, 중립 중 하나>",
+        "minor_emotion": "<보다 구체적인 감정 소분류>",
+        "confidence": <0.0 ~ 1.0 사이의 신뢰도 숫자>
+    }}
+    반드시 JSON 형태로만 출력해 주세요.
+    """)
+
+    prompt = prompt_template.format(user_input=user_input, context=context)
+    response = llm.predict(prompt)
+
+    try:
+        parsed = json.loads(response)
+    except json.JSONDecodeError:
+        parsed = {"error": "Invalid JSON returned from GPT", "raw": response}
+
+    return parsed

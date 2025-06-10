@@ -2,13 +2,14 @@ import streamlit as st
 import pandas as pd
 import datetime as dt
 from openai import OpenAI
-from procedure import boot, purge, analyze_emotion
+from procedure import boot, purge, analyze_emotion, load_documents, build_vectorstore, analyze_emotion_and_confidence
 
 # ------------------------------------------------------------------------------------------ #
 
 args = boot()
 client = OpenAI(api_key=args.openai_api_key)
 text_csv = pd.read_csv(args.text_csv_path)
+df_emotion = load_documents('./data/emotion_talks.csv', limit=1000)
 
 st.set_page_config(page_title="나의 상담노트 감정 분석 챗봇", layout="centered")
 st.title("🧠 나의 상담노트 감정 분석 챗봇")
@@ -33,6 +34,29 @@ if st.button("📝 감정일기 저장하기"):  # for develope (without api cal
 
         except Exception as e:
             timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+if st.button("🔍 감정 분석하기"):
+    if text.strip():
+        with st.spinner("GPT가 감정을 분석하는 중입니다..."):
+            vectorstore = build_vectorstore(df_emotion)
+            result = analyze_emotion_and_confidence(text, vectorstore, top_k=5)
+        try:
+            major = result['major_emotion']
+            minor = result['minor_emotion']
+            confidence = result['confidence']
+
+            st.session_state.emotion_log.append({
+                "날짜": args.today,
+                "감정 대분류": major,
+                "감정 소분류": minor,
+                "신뢰도": confidence
+            })
+
+            st.success(f"📌 감정 분석 결과: {major}-{minor} (신뢰도: {confidence:.2f})")
+        except Exception as e:
+            st.error(f"❌ 분석 결과 파싱 중 오류 발생: {e}")
+    else:
+        st.warning("먼저 감정일기를 입력해주세요!")
 
 # if st.button("🔍 감정 분석하기"):
 #     if text.strip():
