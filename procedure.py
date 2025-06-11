@@ -167,6 +167,7 @@ def analyze_emotion_and_confidence(user_input: str, vectorstore: FAISS, top_k: i
         "confidence": <0.0 ~ 1.0 사이의 신뢰도 숫자>
     }}
     반드시 JSON 형태로만 출력해 주세요.
+    major_emotion은 반드시 "기쁨", "슬픔", "분노", "불안", "당황", "상처", "중립" 중 하나여야 합니다.
     """)
 
     prompt = prompt_template.format(user_input=user_input, context=context)

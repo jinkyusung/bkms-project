@@ -6,6 +6,20 @@ import plotly.express as px
 # ------------------------------------------------------------------------------------------ #
 
 
+emotion_colors = {
+    "분노": "#FFADAD",
+    "불안": "#FFD6A5",
+    "당황": "#FDFFB6",
+    "슬픔": "#A0C4FF",
+    "상처": "#BDB2FF",
+    "기쁨": "#CAFFBF",
+    "중립": "#EDEDE9",
+}
+
+
+# ------------------------------------------------------------------------------------------ #
+
+
 def calendar(emotion_data):
     end_date = pd.to_datetime("today").normalize()
     start_date = end_date - pd.Timedelta(days=29)
@@ -19,17 +33,6 @@ def calendar(emotion_data):
         for date, group in emotion_data_30.groupby('date')
     }
 
-    emotion_colors = {
-        "기쁨": "#FFD700",
-        "슬픔": "#1E90FF",
-        "분노": "#FF4500",
-        "불안": "#8A2BE2",
-        "당황": "#FF69B4",
-        "상처": "#708090",
-        "중립": "#D3D3D3",
-        "없음": "#F0F0F0"  # 없는 날
-    }
-
     st.markdown(f"### 최근 30일 감정 캘린더 ({start_date.strftime('%Y-%m-%d')} ~ {end_date.strftime('%Y-%m-%d')})")
 
     calendar_html = "<table style='width:100%; text-align:center;'>"
@@ -40,7 +43,7 @@ def calendar(emotion_data):
 
     for i, day in enumerate(date_range):
         emotion = emotion_by_day.get(day.date(), "없음")
-        color = emotion_colors.get(emotion, "#F0F0F0")
+        color = emotion_colors.get(emotion, "#FFFFFC")
         calendar_html += f"<td style='background-color:{color}; padding:10px; border-radius:5px;'>{day.day}<br><small>{emotion}</small></td>"
 
         if (i + padding + 1) % 7 == 0:
@@ -64,9 +67,21 @@ def pie_chart(df):
     col1, col2 = st.columns(2)
 
     with col1:
-        fig7 = px.pie(valid_7, names="major_emotion", title="최근 7일 감정 분포")
+        fig7 = px.pie(
+            valid_7,
+            names="major_emotion",
+            title="최근 7일 감정 분포",
+            color="major_emotion",
+            color_discrete_map=emotion_colors
+        )
         st.plotly_chart(fig7, use_container_width=True)
 
     with col2:
-        fig30 = px.pie(valid_30, names="major_emotion", title="최근 30일 감정 분포")
+        fig30 = px.pie(
+            valid_30,
+            names="major_emotion",
+            title="최근 30일 감정 분포",
+            color="major_emotion",
+            color_discrete_map=emotion_colors
+        )
         st.plotly_chart(fig30, use_container_width=True)
