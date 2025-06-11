@@ -32,17 +32,17 @@ text = st.text_area("✍️ 감정일기를 작성하세요", height=250)
 
 # ------------------------------------------------------------------------------------------ #
 
-if st.button("📝 감정일기 저장하기"):  # for develope (without api call)
-    if text.strip():
-        try:
-            timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            new_row = pd.DataFrame([{"text": f"{text}", "date": writen_date, "timestamp": timestamp}])
-            text_csv = pd.concat([text_csv, new_row], ignore_index=True)
-            text_csv.to_csv(args.text_csv_path, index=False)
-            st.success(f"일기 저장 성공")
+# if st.button("📝 감정일기 저장하기"):  # for develope (without api call)
+#     if text.strip():
+#         try:
+#             timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#             new_row = pd.DataFrame([{"text": f"{text}", "date": writen_date, "timestamp": timestamp}])
+#             text_csv = pd.concat([text_csv, new_row], ignore_index=True)
+#             text_csv.to_csv(args.text_csv_path, index=False)
+#             st.success(f"일기 저장 성공")
 
-        except Exception as e:
-            timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#         except Exception as e:
+#             timestamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # ------------------------------------------------------------------------------------------ #
 
