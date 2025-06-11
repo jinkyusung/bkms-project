@@ -24,7 +24,8 @@ class Arguments:
     min_date: datetime
     max_date: datetime
     
-    text_csv_path: DataFrame
+    text_csv_path: str
+    emotion_csv_path: str
 
 
 # ------------------------------------------------------------------------------------------ #
@@ -64,13 +65,25 @@ def boot() -> Arguments:
         text_csv = pd.DataFrame(columns=["text", "date", "timestamp"])
         text_csv.to_csv(text_csv_path, index=False)
 
+    # Set up the CSV path.
+    emotion_csv_path = os.getenv('EMOTION_CSV_PATH')
+
+    csv_dir = os.path.dirname(emotion_csv_path)
+    if not os.path.exists(csv_dir):
+        os.makedirs(csv_dir, exist_ok=True)
+
+    if not os.path.exists(emotion_csv_path):
+        text_csv = pd.DataFrame(columns=["major_emotion", "minor_emotion", "confidence", "date", "timestamp"])
+        text_csv.to_csv(emotion_csv_path, index=False)
+
     # Create an instance of Arguments with the loaded configurations.
     args = Arguments(
         openai_api_key=open_api_key,
         today=today,
         min_date=min_date,
         max_date=max_date, 
-        text_csv_path=text_csv_path
+        text_csv_path=text_csv_path,
+        emotion_csv_path=emotion_csv_path
     )
 
     return args
