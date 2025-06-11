@@ -21,7 +21,7 @@ project-root/
 └── requirements.txt
 ```
 
-### 2. Prepare Data
+### 2. Prepare Data for RAG
 
 1. AI허브에서 감성 대화 말뭉치 데이터를 [다운로드](https://aihub.or.kr/aihubdata/data/view.do?dataSetSn=86)한다.  
 
