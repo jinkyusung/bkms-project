@@ -8,7 +8,8 @@
 project-root/
 ├── data/
 │   ├── emotion_talks.csv
-│   ├── text.csv
+│   ├── emotion.csv  # 감정 분석 기록 저장
+│   ├── text.csv  # 일기 raw text 저장
 │   ├── 감성대화말뭉치(최종데이터)_Training.xlsx
 │   └── 감성대화말뭉치(최종데이터)_Validation.xlsx
 ├── .env
