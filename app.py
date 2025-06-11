@@ -72,9 +72,6 @@ if st.button("🔍 감정 분석하기"):
             # 데이터 업데이트
             emotion_history = load_emotion_history()
 
-            if st.button("분석 결과 반영하기"):
-                st.rerun()
-
         except Exception as e:
             st.error(f"❌ 분석 결과 파싱 중 오류 발생: {e}")
     else:
