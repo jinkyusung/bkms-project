@@ -2,11 +2,11 @@
 
 9조 / BKMS1 project / 2025 spring
 
-| 학과        | 이름   |
-|-------------|--------|
-| 수학교육 | 강보선 |
-| 데이터사이언스 | 박준형 |
-| 데이터사이언스 | 성진규 |
+| 학과        | 이름   | GitHub |
+|-------------|--------|--------|
+| 수학교육 | 강보선 | [boseonkang](https://github.com/boseonkang) |
+| 데이터사이언스 | 박준형 | [junbro1016](https://github.com/junbro1016) |
+| 데이터사이언스 | 성진규 | [jinkyusung](https://github.com/jinkyusung) |
 
 ## I. Structure
 
