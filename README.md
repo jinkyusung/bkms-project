@@ -1,13 +1,16 @@
 # 감정분석 챗봇
 
-## Structure
+## I. Structure
 
-### Directory
+### 1. Directory
 
 ```bash
 project-root/
 ├── data/
-│   └── text.csv
+│   ├── emotion_talks.csv
+│   ├── text.csv
+│   ├── 감성대화말뭉치(최종데이터)_Training.xlsx
+│   └── 감성대화말뭉치(최종데이터)_Validation.xlsx
 ├── .env
 ├── .gitignore
 ├── README.md
@@ -16,16 +19,30 @@ project-root/
 └── requirements.txt
 ```
 
-### Environment variables
+### 2. Prepare Data
 
-- `OPENAI_API_KEY`
-- `TEXT_CSV_PATH`
+1. AI허브에서 감성 대화 말뭉치 데이터를 [다운로드](https://aihub.or.kr/aihubdata/data/view.do?dataSetSn=86)한다.  
+
+2. 다운로드한 디렉토리 `18.감성대화` 에서 다음 두 가지 `zip` 파일을 압축 해제하여 `xlsx` 파일을 얻는다.  
+    - `Training_221115_add/원천데이터/감성대화말뭉치(최종데이터)_Training.zip` ❯❯❯ `감성대화말뭉치(최종데이터)_Training.xlsx`
+    - `Validation_221115_add/원천데이터/감성대화말뭉치(최종데이터)_Validation.zip` ❯❯❯ `감성대화말뭉치(최종데이터)_Validation.xlsx`
+
+3. `xlsx` 파일을 `data` 디렉토리에 넣는다.  
+
+4. **`preprocess.py`를 실행**해서, 본 애플리케이션에서 사용할 전처리된 데이터 `./data/emotion_talks.csv`를 생성한다.  
+> [!CAUTION]
+> AI허브의 사용약관에 따라 위 데이터는 GitHub에 업로드할 수 없으므로, 반드시 상기한 웹사이트에 접속하여 직접 데이터를 다운로드 받고, 압축 해제하여야 합니다.
+
+### 3. Environment Variables
+
+- `OPENAI_API_KEY='<your_api_key>'`
+- `TEXT_CSV_PATH='./data/text.csv'`
 
 > [!IMPORTANT]
 > 반드시 `.env` 파일을 직접 만들고, 상기한 모든 환경변수를 명시해야 정상적으로 실행됩니다.  
 > 자세한 사용법은 `python-dotenv` [docs](https://pypi.org/project/python-dotenv/)를 참고해주세요.
 
-## Requirements
+## II. Requirements
 
 ```bash
 conda create -n <env-name> python=3.10
@@ -33,7 +50,7 @@ conda activate <env-name>
 pip install -r requirements.txt
 ```
 
-## Run
+## III. Run
 
 ```bash
 > streamlit run app.py

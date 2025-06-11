@@ -1,7 +1,11 @@
 import pandas as pd
 
-df_train = pd.read_excel('~/Downloads/emotion_talk//Training_221115_add/original/corpus_final_training.xlsx', index_col=0)
-df_valid = pd.read_excel('~/Downloads/emotion_talk/Validation_221115_add/original/corpus_final_valid.xlsx', index_col=0)
+# Path
+path_trn = './data/감성대화말뭉치(최종데이터)_Training.xlsx'
+path_val = './data/감성대화말뭉치(최종데이터)_Validation.xlsx'
+
+df_train = pd.read_excel(path_trn, index_col=0)
+df_valid = pd.read_excel(path_val, index_col=0)
 df_all = pd.concat([df_train, df_valid], ignore_index=True)
 
 emotions = ['감정_대분류', '감정_소분류']
