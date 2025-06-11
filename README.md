@@ -31,7 +31,7 @@ project-root/
 
 ### 2. Prepare Data for RAG
 
-<!-- 이는 General한 실행 방법입니다만, 채점의 편의를 위해서 조교님께 드리는 파일에는 data 폴더 및 예시데이터를 포함하였으니 이 과정은 무시하셔도 됩니다! -->
+<!-- 이는 General한 실행 방법입니다만, 채점의 편의를 위해서 조교님께 드리는 파일에는 data 폴더 및 예시 데이터를 포함하였으니 이 과정은 무시하셔도 됩니다! -->
 
 1. AI허브에서 감성 대화 말뭉치 데이터를 [다운로드](https://aihub.or.kr/aihubdata/data/view.do?dataSetSn=86)한다.  
 
